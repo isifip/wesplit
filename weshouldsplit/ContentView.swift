@@ -8,6 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @State private var checkAmount = Double(0)
+    @State private var numberOfPeople = 2
+    @State private var tipPercentage = 20
+    
+    let tipPercentages = [10, 15, 20, 25, 0]
+    
+    let localCurrency: FloatingPointFormatStyle<Double>.Currency = .currency(code: Locale.current.currencyCode ?? "USD")
+    
     var body: some View {
         ZStack(alignment: .top) {
             Image("background")
@@ -29,6 +38,43 @@ struct ContentView: View {
                     }
                     .padding(.trailing)
                 }
+                VStack {
+                    TextField("Amount", value: $checkAmount, format: localCurrency)
+                        .padding()
+                        .frame(height: 50)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(34)
+                        .padding()
+                        .shadow(radius: 20)
+                        .keyboardType(.decimalPad)
+                    Divider()
+                }
+                VStack {
+                    HStack {
+                        Text("Number of people")
+                        Spacer()
+                        Picker("Number of people", selection: $numberOfPeople) {
+                            ForEach(2..<10) {
+                                Text("\($0) people")
+                            }
+                        }
+                        .pickerStyle(.menu)
+                    }
+                    .padding([.horizontal, .top], 30)
+                    Picker("Tip percentage", selection: $tipPercentage) {
+                        ForEach(tipPercentages, id: \.self) {
+                            Text($0, format: .percent)
+                        }
+                    }
+                    .padding()
+                    .pickerStyle(.segmented)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 120)
+                .background(.ultraThinMaterial)
+                .cornerRadius(34)
+                .padding()
+                .shadow(radius: 20)
             }
         }
     }
