@@ -13,7 +13,7 @@ struct ContentView: View {
     @State private var numberOfPeople = 2
     @State private var tipPercentage = 20
     
-    let tipPercentages = [10, 15, 20, 25, 0]
+    let tipPercentages = [10, 15, 20, 25]
     
     let localCurrency: FloatingPointFormatStyle<Double>.Currency = .currency(code: Locale.current.currencyCode ?? "USD")
     
@@ -30,6 +30,11 @@ struct ContentView: View {
                         ButtonLabelView(systemName: "paintbrush")
                     }
                     .padding(.leading)
+                    Spacer()
+                    Text("Split")
+                        .foregroundColor(.white)
+                        .font(.title)
+                        .fontWeight(.black)
                     Spacer()
                     Button {
                         // more code to come
@@ -51,16 +56,16 @@ struct ContentView: View {
                 }
                 VStack {
                     HStack {
-                        Text("Number of people")
+                        Text("Split between")
                         Spacer()
                         Picker("Number of people", selection: $numberOfPeople) {
-                            ForEach(2..<10) {
+                            ForEach(2..<11) {
                                 Text("\($0) people")
                             }
                         }
                         .pickerStyle(.menu)
                     }
-                    .padding([.horizontal, .top], 30)
+                    .padding([.horizontal, .top])
                     Picker("Tip percentage", selection: $tipPercentage) {
                         ForEach(tipPercentages, id: \.self) {
                             Text($0, format: .percent)
