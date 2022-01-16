@@ -9,12 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @State private var checkAmount = Double(0)
+    @State private var checkAmount: Double = Double(0)
     @State private var numberOfPeople = 2
     @State private var tipPercentage = 20
     
+    @FocusState private var amountIsFocused: Bool
     
-    let tipPercentages = [10, 15, 20, 25]
+    let tipPercentages = [5, 10, 15, 20, 25, 30, 40, 50]
     
     let localCurrency: FloatingPointFormatStyle<Double>.Currency = .currency(code: Locale.current.currencyCode ?? "USD")
     
@@ -57,55 +58,32 @@ struct ContentView: View {
                 picker
                 Divider()
                 VStack(spacing: 20) {
-                    totalAmountView
-                    VStack(spacing: 0) {
-                        HStack {
-                            Text("Total per person")
-                                .font(.title3).fontWeight(.semibold)
-                            Spacer()
-                        }
-                        .padding([.horizontal, .top], 10)
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(totalPerPerson, format: localCurrency)
-                                    .font(.title2).fontWeight(.black)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 10)
-                            Divider()
-                            Spacer()
-                            VStack(alignment: .leading) {
-                                Text(personTip, format: localCurrency)
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                Text("Tip value".uppercased())
-                                    .font(.body)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 10)
-                        }
-                        .frame(height: 70)
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 100)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(12)
-                    .shadow(radius: 20)
+                    SummaryHeaderView(header: "Total Amount", amount: totalAmount, tipAmount: totalTip)
+                    SummaryHeaderView(header: "Total Per Person", amount: totalPerPerson, tipAmount: personTip)
                 }
                 .padding(.top)
             }
             .padding()
         }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button {
+                    amountIsFocused = false
+                } label: {
+                    Text("Done")
+                }
+            }
+        }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-            .preferredColorScheme(.dark)
-    }
-}
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView()
+//            .preferredColorScheme(.dark)
+//    }
+//}
 
 extension ContentView {
     var textField: some View {
@@ -118,6 +96,7 @@ extension ContentView {
                 .padding(.bottom)
                 .shadow(radius: 20)
                 .keyboardType(.decimalPad)
+                .focused($amountIsFocused)
             Divider()
         }
     }
@@ -136,7 +115,9 @@ extension ContentView {
                 .fontWeight(.black)
             Spacer()
             Button {
-                checkAmount = Double(0)
+                withAnimation {
+                    checkAmount = Double(0)
+                }
             } label: {
                 ButtonLabelView(systemName: "arrow.counterclockwise")
             }
@@ -182,43 +163,6 @@ extension ContentView {
             //.pickerStyle(.segmented)
         }
     }
-    
-    var totalAmountView: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text("Total Amount")
-                    .font(.title3).fontWeight(.semibold)
-                Spacer()
-            }
-            .padding([.horizontal, .top], 10)
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(totalAmount, format: localCurrency)
-                        .font(.title2).fontWeight(.black)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 10)
-                Divider()
-                Spacer()
-                VStack(alignment: .leading) {
-                    Text(totalTip, format: localCurrency)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                    Text("Tip value".uppercased())
-                        .font(.body)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 10)
-            }
-            .frame(height: 70)
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 100)
-        .background(.ultraThinMaterial)
-        .cornerRadius(12)
-        .shadow(radius: 20)
-    }
 }
 
 struct ButtonLabelView: View {
@@ -235,3 +179,4 @@ struct ButtonLabelView: View {
             .foregroundColor(.primary)
     }
 }
+
