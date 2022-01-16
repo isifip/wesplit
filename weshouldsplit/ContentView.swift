@@ -17,6 +17,27 @@ struct ContentView: View {
     
     let localCurrency: FloatingPointFormatStyle<Double>.Currency = .currency(code: Locale.current.currencyCode ?? "USD")
     
+    var totalAmount: Double {
+        let tipSelection = Double(tipPercentage)
+        let tipValue = checkAmount / 100 * tipSelection
+        let grandTotal = checkAmount + tipValue
+        return grandTotal
+    }
+    
+    var totalTip: Double {
+        let tipSelection = Double(tipPercentage)
+        let tipValue = checkAmount / 100 * tipSelection
+        return tipValue
+    }
+    
+    var totalPerPerson: Double {
+        // Calculate the total per person here
+        let peopleCount = Double(numberOfPeople + 2)
+        let amountPerPerson = totalAmount / peopleCount
+        
+        return amountPerPerson
+    }
+    
     var body: some View {
         ZStack(alignment: .top) {
             Image("background")
@@ -37,23 +58,13 @@ struct ContentView: View {
                         .fontWeight(.black)
                     Spacer()
                     Button {
-                        // more code to come
+                        checkAmount = Double(0)
                     } label: {
                         ButtonLabelView(systemName: "arrow.counterclockwise")
                     }
                     .padding(.trailing)
                 }
-                VStack {
-                    TextField("Amount", value: $checkAmount, format: localCurrency)
-                        .padding()
-                        .frame(height: 50)
-                        .background(.ultraThinMaterial)
-                        .cornerRadius(34)
-                        .padding()
-                        .shadow(radius: 20)
-                        .keyboardType(.decimalPad)
-                    Divider()
-                }
+                textField
                 VStack {
                     HStack {
                         Text("Split between")
@@ -74,12 +85,44 @@ struct ContentView: View {
                     .padding()
                     .pickerStyle(.segmented)
                 }
-                .frame(maxWidth: .infinity)
-                .frame(height: 120)
-                .background(.ultraThinMaterial)
-                .cornerRadius(34)
-                .padding()
-                .shadow(radius: 20)
+                VStack {
+                    VStack(spacing: 0) {
+                        HStack {
+                            Text("Total Amount")
+                                .font(.title3).fontWeight(.semibold)
+                            Spacer()
+                        }
+                        .padding([.horizontal, .top], 10)
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(totalAmount, format: localCurrency)
+                                    .font(.title2).fontWeight(.black)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 10)
+                            Divider()
+                            Spacer()
+                            VStack(alignment: .leading) {
+                                Text(totalTip, format: localCurrency)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                Text("Tip value".uppercased())
+                                    .font(.body)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 10)
+                        }
+                        .frame(height: 70)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 100)
+                    .background(.ultraThinMaterial)
+                    .cornerRadius(12)
+                    .padding()
+                    .shadow(radius: 20)
+                    
+                }
             }
         }
     }
@@ -91,6 +134,21 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
+extension ContentView {
+    var textField: some View {
+        VStack {
+            TextField("Amount", value: $checkAmount, format: localCurrency)
+                .padding()
+                .frame(height: 50)
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+                .padding()
+                .shadow(radius: 20)
+                .keyboardType(.decimalPad)
+            Divider()
+        }
+    }
+}
 
 struct ButtonLabelView: View {
     var systemName: String
