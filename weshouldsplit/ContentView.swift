@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var numberOfPeople = 2
     @State private var tipPercentage = 20
     
+    
     let tipPercentages = [10, 15, 20, 25]
     
     let localCurrency: FloatingPointFormatStyle<Double>.Currency = .currency(code: Locale.current.currencyCode ?? "USD")
@@ -30,6 +31,11 @@ struct ContentView: View {
         return tipValue
     }
     
+    var personTip: Double {
+        let tipperperson = totalTip / Double(numberOfPeople + 2)
+        return tipperperson
+    }
+    
     var totalPerPerson: Double {
         // Calculate the total per person here
         let peopleCount = Double(numberOfPeople + 2)
@@ -45,57 +51,23 @@ struct ContentView: View {
                 .scaleEffect(2)
             VStack {
                 HStack {
-                    Button {
-                        // more code to come
-                    } label: {
-                        ButtonLabelView(systemName: "paintbrush")
-                    }
-                    .padding(.leading)
-                    Spacer()
-                    Text("Split")
-                        .foregroundColor(.white)
-                        .font(.title)
-                        .fontWeight(.black)
-                    Spacer()
-                    Button {
-                        checkAmount = Double(0)
-                    } label: {
-                        ButtonLabelView(systemName: "arrow.counterclockwise")
-                    }
-                    .padding(.trailing)
+                    buttons
                 }
                 textField
-                VStack {
-                    HStack {
-                        Text("Split between")
-                        Spacer()
-                        Picker("Number of people", selection: $numberOfPeople) {
-                            ForEach(2..<11) {
-                                Text("\($0) people")
-                            }
-                        }
-                        .pickerStyle(.menu)
-                    }
-                    .padding([.horizontal, .top])
-                    Picker("Tip percentage", selection: $tipPercentage) {
-                        ForEach(tipPercentages, id: \.self) {
-                            Text($0, format: .percent)
-                        }
-                    }
-                    .padding()
-                    .pickerStyle(.segmented)
-                }
-                VStack {
+                picker
+                Divider()
+                VStack(spacing: 20) {
+                    totalAmountView
                     VStack(spacing: 0) {
                         HStack {
-                            Text("Total Amount")
+                            Text("Total per person")
                                 .font(.title3).fontWeight(.semibold)
                             Spacer()
                         }
                         .padding([.horizontal, .top], 10)
                         HStack {
                             VStack(alignment: .leading) {
-                                Text(totalAmount, format: localCurrency)
+                                Text(totalPerPerson, format: localCurrency)
                                     .font(.title2).fontWeight(.black)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -103,7 +75,7 @@ struct ContentView: View {
                             Divider()
                             Spacer()
                             VStack(alignment: .leading) {
-                                Text(totalTip, format: localCurrency)
+                                Text(personTip, format: localCurrency)
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                                 Text("Tip value".uppercased())
@@ -119,11 +91,11 @@ struct ContentView: View {
                     .frame(height: 100)
                     .background(.ultraThinMaterial)
                     .cornerRadius(12)
-                    .padding()
                     .shadow(radius: 20)
-                    
                 }
+                .padding(.top)
             }
+            .padding()
         }
     }
 }
@@ -131,6 +103,7 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .preferredColorScheme(.dark)
     }
 }
 
@@ -142,11 +115,109 @@ extension ContentView {
                 .frame(height: 50)
                 .background(.ultraThinMaterial)
                 .cornerRadius(12)
-                .padding()
+                .padding(.bottom)
                 .shadow(radius: 20)
                 .keyboardType(.decimalPad)
             Divider()
         }
+    }
+    
+    var buttons: some View {
+        HStack {
+            Button {
+                // more code to come
+            } label: {
+                ButtonLabelView(systemName: "paintbrush")
+            }
+            Spacer()
+            Text("Split")
+                .foregroundColor(.white)
+                .font(.title)
+                .fontWeight(.black)
+            Spacer()
+            Button {
+                checkAmount = Double(0)
+            } label: {
+                ButtonLabelView(systemName: "arrow.counterclockwise")
+            }
+        }
+    }
+    
+    var picker: some View {
+        VStack {
+            HStack {
+                Text("Split between")
+                    .padding(.leading, 5)
+                Spacer()
+                Picker("Number of people", selection: $numberOfPeople) {
+                    ForEach(2..<11) {
+                        Text("\($0) people")
+                    }
+                }
+                .padding(.horizontal)
+                .frame(width: 100)
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+                .shadow(radius: 20)
+            }
+            .padding(.vertical)
+            Divider()
+            HStack {
+                Text("Select tip percentage")
+                    .padding(.leading, 5)
+                Spacer()
+                Picker("Tip percentage", selection: $tipPercentage) {
+                    ForEach(tipPercentages, id: \.self) {
+                        Text($0, format: .percent)
+                    }
+                }
+                .padding(.horizontal)
+                .frame(width: 100)
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+                .shadow(radius: 20)
+                
+            }
+            .padding(.vertical)
+            //.pickerStyle(.segmented)
+        }
+    }
+    
+    var totalAmountView: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("Total Amount")
+                    .font(.title3).fontWeight(.semibold)
+                Spacer()
+            }
+            .padding([.horizontal, .top], 10)
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(totalAmount, format: localCurrency)
+                        .font(.title2).fontWeight(.black)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 10)
+                Divider()
+                Spacer()
+                VStack(alignment: .leading) {
+                    Text(totalTip, format: localCurrency)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    Text("Tip value".uppercased())
+                        .font(.body)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 10)
+            }
+            .frame(height: 70)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 100)
+        .background(.ultraThinMaterial)
+        .cornerRadius(12)
+        .shadow(radius: 20)
     }
 }
 
